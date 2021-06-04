@@ -13,9 +13,9 @@ type FormatFnMap = map[string]FormatFn
 
 // 公共的格式化函数
 var commonFormatFnMap = FormatFnMap{
-	"percent": percent,
-	"date":    date,
-	"hour":    hour,
+	"percent": formatPercent,
+	"date":    formDate,
+	"hour":    formHour,
 }
 
 type CustomFormat struct {
@@ -35,7 +35,7 @@ func NewFormatFn(cformats ...CustomFormat) FormatFnMap {
 }
 
 // 格式化百分比
-func percent(n interface{}) string {
+func formatPercent(n interface{}) string {
 	switch n.(type) {
 	case int, int8, int16, int32, int64:
 		if polyfillIsZero(reflect.ValueOf(n)) {
@@ -53,7 +53,7 @@ func percent(n interface{}) string {
 }
 
 // 格式化日期
-func date(n interface{}) string {
+func formDate(n interface{}) string {
 	switch n.(type) {
 	case time.Time:
 		return n.(time.Time).Format("2006-01-02")
@@ -64,7 +64,7 @@ func date(n interface{}) string {
 	}
 }
 
-func hour(n interface{}) string {
+func formHour(n interface{}) string {
 	var seconds int64 = 0
 	switch n.(type) {
 	case int:

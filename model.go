@@ -15,6 +15,7 @@ const (
 	tagIndex   = "index"   //顺序
 	tagDefault = "default" //默认值
 	tagFormat  = "format"  //格式化
+	tagParse   = "parse"   //解析
 )
 
 var supportTag = map[string]int{
@@ -22,6 +23,7 @@ var supportTag = map[string]int{
 	tagIndex:   2,
 	tagDefault: 2,
 	tagFormat:  2,
+	tagParse:   2,
 }
 
 func parseStructTag(data string) (attrs map[string]bool, tags map[string]string) {
