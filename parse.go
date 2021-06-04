@@ -1,6 +1,8 @@
 package xlsxp
 
-import "strings"
+import (
+	"strings"
+)
 
 // 解析方法
 type ParseFn = func(cellVal string) string
