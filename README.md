@@ -11,10 +11,12 @@ Easier to use https://github.com/tealeg/xlsx
 
 ## Example
 
+
+### Export xlsx 
 ```go
 type Test struct {
-    UserName string `json:"user_name" excel:"header(学员);index(1);default(---)"`
-	CompletePercent    float64 `json:"complete_percent" excel:"header(完课率);index(2);format(percent)"`
+    UserName string `json:"user_name" excel:"header(学员);index(0);default(---)"`
+	CompletePercent    float64 `json:"complete_percent" excel:"header(完课率);index(1);format(percent)"`
 }
 
 datas := make([]Test, 0)
@@ -31,4 +33,15 @@ datas = append(datas, Test{
 file, err := uexport.ExportExcel("sheet1", datas)
 ...
 
+```
+
+### Import xlsx 
+```go
+type Test struct {
+    CompletePercent float64 `json:"complete_percent" excel:"index(1);parse(percent)"`
+    UserName        string  `json:"user_name" excel:"index(0);"`
+}
+
+targetDatas := make([]Test, 0)
+err = ImportExcel(xlsxBuf.Bytes(), "sheet1", &targetDatas)
 ```
