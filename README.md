@@ -1,4 +1,4 @@
-# xlsxp
+# xlsxp ![test](https://github.com/a631807682/xlsxp/actions/workflows/test.yml/badge.svg)
 Easier imports and exports with [xlsx](https://github.com/tealeg/xlsx)
 
 ## Description
