@@ -50,6 +50,9 @@ func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (
 		if i == 0 {
 			for _, cell := range row {
 				rowVal.AddCell().SetValue(cell.Header)
+				if cell.Width > 0 {
+					sheet.SetColWidth(i, i, cell.Width)
+				}
 			}
 		}
 
@@ -63,6 +66,7 @@ func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (
 
 type xcell struct {
 	Header string        // 表头
+	Width  float64       // 表头长度
 	Index  int           // 排序
 	Cell   reflect.Value // 列数据
 }
@@ -114,11 +118,19 @@ func getExcelKeyVals(vals interface{}, formatFnMap FormatFnMap) (rows [][]xcell,
 						cellVal = reflect.ValueOf(formatVal)
 					}
 
+					var cellWidth float64
+					if widthStr, ok := tags[tagWidth]; ok {
+						if val, err := strconv.ParseFloat(widthStr, 64); err == nil {
+							cellWidth = val
+						}
+					}
+
 					index, _ := strconv.Atoi(headerIndex)
 					cell := xcell{
 						Index:  index,
 						Header: headerName,
 						Cell:   cellVal,
+						Width:  cellWidth,
 					}
 					cells = append(cells, cell)
 				}
