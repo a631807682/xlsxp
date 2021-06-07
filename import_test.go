@@ -118,7 +118,7 @@ func TestTimeTypeImportExcel(t *testing.T) {
 	originData = append(originData, timeImportModel{
 		Time: time.Now(),
 	}, timeImportModel{
-		Time: time.Now(),
+		Time: time.Now().Add(10000),
 	})
 	xlsxBytes, err := genBaseXlsxBytes(originData, sheetName)
 	if err != nil {
