@@ -105,7 +105,7 @@ func setExcelKeyVals(sheet *xlsx.Sheet, targets interface{}, parseFnMap ParseFnM
 					cell.SetValue(pVal)
 				}
 
-				setStrByKind(targetField, cell)
+				mapCellIntoValue(targetField, cell)
 			}
 		}
 
@@ -115,7 +115,7 @@ func setExcelKeyVals(sheet *xlsx.Sheet, targets interface{}, parseFnMap ParseFnM
 	return
 }
 
-func setStrByKind(filedInd reflect.Value, cell *xlsx.Cell) {
+func mapCellIntoValue(filedInd reflect.Value, cell *xlsx.Cell) {
 	switch filedInd.Kind() {
 	case reflect.Bool:
 		filedInd.SetBool(cell.Bool())

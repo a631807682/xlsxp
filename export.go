@@ -49,7 +49,8 @@ func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (
 	for i, row := range rows {
 		if i == 0 {
 			for _, cell := range row {
-				rowVal.AddCell().SetValue(cell.Header)
+				excelCell := rowVal.AddCell()
+				excelCell.SetValue(cell.Header)
 				if cell.Width > 0 {
 					sheet.SetColWidth(i, i, cell.Width)
 				}
@@ -58,7 +59,8 @@ func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (
 
 		rowVal = sheet.AddRow()
 		for _, cell := range row {
-			rowVal.AddCell().SetValue(cell.Cell)
+			excelCell := rowVal.AddCell()
+			excelCell.SetValue(cell.Cell.Interface())
 		}
 	}
 	return
@@ -95,12 +97,9 @@ func getExcelKeyVals(vals interface{}, formatFnMap FormatFnMap) (rows [][]xcell,
 			excelTag := rowType.Field(j).Tag.Get(defaultStructTagName)
 			if excelTag != "" { // 只处理定义了 `excel:"xxx"`
 				_, tags := parseStructTag(excelTag)
-				if headerName, ok := tags[tagHeader]; ok { // 确定表头
-					headerIndex, ok := tags[tagIndex]
-					if !ok {
-						err = fmt.Errorf("excel tag header miss index")
-						return
-					}
+
+				if headerIndex, ok := tags[tagIndex]; ok {
+					headerName, _ := tags[tagHeader] // 表头
 
 					cellVal := rowVal.Field(j)
 					if defVal, ok := tags[tagDefault]; ok && polyfillIsZero(cellVal) { // 设置默认值
