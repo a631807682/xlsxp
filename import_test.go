@@ -11,7 +11,7 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
-type baseModel struct {
+type baseImportModel struct {
 	Int   int   `excel:"index(0)"`
 	Int8  int8  `excel:"index(1)"`
 	Int16 int16 `excel:"index(2)"`
@@ -33,7 +33,7 @@ type baseModel struct {
 	Bool   bool   `excel:"index(15)"`
 }
 
-var baseTestData = baseModel{
+var baseImportData = baseImportModel{
 	Int:    int(1<<31 - 1),
 	Int8:   int8(1<<7 - 1),
 	Int16:  int16(1<<15 - 1),
@@ -88,14 +88,14 @@ func genBaseXlsxBytes(datas interface{}, sheetName string) (xlsxDatas []byte, er
 func TestBaseTypeImportExcel(t *testing.T) {
 	sheetName := "sheet1"
 
-	originData := make([]baseModel, 0)
-	originData = append(originData, baseTestData, baseTestData)
+	originData := make([]baseImportModel, 0)
+	originData = append(originData, baseImportData, baseImportData)
 	xlsxBytes, err := genBaseXlsxBytes(originData, sheetName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	targetDatas := make([]baseModel, 0)
+	targetDatas := make([]baseImportModel, 0)
 	err = ImportExcel(xlsxBytes, sheetName, &targetDatas)
 	if err != nil {
 		t.Fatal(err)
@@ -107,17 +107,17 @@ func TestBaseTypeImportExcel(t *testing.T) {
 	}
 }
 
-type timeModel struct {
+type timeImportModel struct {
 	Time time.Time `excel:"index(0)"` // 精度会丢失
 }
 
 func TestTimeTypeImportExcel(t *testing.T) {
 	sheetName := "sheet1"
 
-	originData := make([]timeModel, 0)
-	originData = append(originData, timeModel{
+	originData := make([]timeImportModel, 0)
+	originData = append(originData, timeImportModel{
 		Time: time.Now(),
-	}, timeModel{
+	}, timeImportModel{
 		Time: time.Now(),
 	})
 	xlsxBytes, err := genBaseXlsxBytes(originData, sheetName)
@@ -125,7 +125,7 @@ func TestTimeTypeImportExcel(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	targetDatas := make([]timeModel, 0)
+	targetDatas := make([]timeImportModel, 0)
 	err = ImportExcel(xlsxBytes, sheetName, &targetDatas)
 	if err != nil {
 		t.Fatal(err)
