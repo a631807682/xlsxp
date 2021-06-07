@@ -1,13 +1,13 @@
 # xlsxp
-Easier to use https://github.com/tealeg/xlsx
+Easier imports and exports with [xlsx](https://github.com/tealeg/xlsx)
 
 ## Description
-> 通过`excel`标签定义`struct`中要导出到`xlxs`的内容。
+> The `excel` tag defines what to export from `struct` to `XLXS`.
 
-1. `header`表示要显示的表头。
-2. `index`表示数据在`xlxs`中的顺序。
-3. `format`表示格式化的方法，目前`format.go`文件中只定义了`percent`一种，可通过`cformats`参数定义私有的格式化方法，或在`format.go`中定义公有的方法。
-4. `default`表示当[数据为空](https://golang.org/src/reflect/value.go?s=34297:34325#L1090)时要显示的内容。
+1. `header` represents the header to display.
+2. `index` represents the order of data.
+3. `format` represents a method of formatting.
+4. `default` represents what to display when the data is empty.
 
 ## Example
 
@@ -15,8 +15,8 @@ Easier to use https://github.com/tealeg/xlsx
 ### Export xlsx 
 ```go
 type Test struct {
-    UserName string `json:"user_name" excel:"header(学员);index(0);default(---)"`
-	CompletePercent    float64 `json:"complete_percent" excel:"header(完课率);index(1);format(percent)"`
+    UserName string `json:"user_name" excel:"header(Student);index(0);default(---)"`
+	CompletePercent    float64 `json:"complete_percent" excel:"header(Complete Percent);index(1);format(percent)"`
 }
 
 datas := make([]Test, 0)
