@@ -30,7 +30,7 @@ datas = append(datas, Test{
     CompletePercent: 17.558,
 })
 
-file, err := uexport.ExportExcel("sheet1", datas)
+file, err := xlsxp.ExportExcel("sheet1", datas)
 ...
 
 ```
@@ -43,5 +43,5 @@ type Test struct {
 }
 
 targetDatas := make([]Test, 0)
-err = ImportExcel(xlsxBuf.Bytes(), "sheet1", &targetDatas)
+err = xlsxp.ImportExcel(xlsxBuf.Bytes(), "sheet1", &targetDatas)
 ```
