@@ -26,7 +26,7 @@ func ImportExcel(data []byte, sheetName string, targets interface{}, cparses ...
 	parseFnMap := NewParseFn(cparses...)
 
 	// 写入结构体
-	err = setExcelKeyVals(sheet, targets, parseFnMap)
+	err = setExcelValsIntoStruct(sheet, targets, parseFnMap)
 	if err != nil {
 		return
 	}
@@ -41,7 +41,7 @@ type fieldInfo struct {
 }
 
 // 映射进数组
-func setExcelKeyVals(sheet *xlsx.Sheet, targets interface{}, parseFnMap ParseFnMap) (err error) {
+func setExcelValsIntoStruct(sheet *xlsx.Sheet, targets interface{}, parseFnMap ParseFnMap) (err error) {
 	targetsValue := reflect.ValueOf(targets)
 	targetsInd := reflect.Indirect(targetsValue)
 

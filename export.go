@@ -33,11 +33,6 @@ type Test struct {
 func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (file *xlsx.File, err error) {
 	// 初始化格式化函数
 	formatFnMap := NewFormatFn(cformats...)
-	// 获取数据表头和值
-	rows, err := getExcelKeyVals(vals, formatFnMap)
-	if err != nil {
-		return
-	}
 
 	file = xlsx.NewFile()
 	sheet, err := file.AddSheet(sheetName)
@@ -45,98 +40,126 @@ func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (
 		return
 	}
 
-	rowVal := sheet.AddRow()
-	for i, row := range rows {
-		if i == 0 {
-			for _, cell := range row {
-				excelCell := rowVal.AddCell()
-				excelCell.SetValue(cell.Header)
-				if cell.Width > 0 {
-					sheet.SetColWidth(i, i, cell.Width)
-				}
-			}
-		}
-
-		rowVal = sheet.AddRow()
-		for _, cell := range row {
-			excelCell := rowVal.AddCell()
-			excelCell.SetValue(cell.Cell.Interface())
-		}
+	// 写入数据到excel
+	err = setStructIntoExcelVals(sheet, vals, formatFnMap)
+	if err != nil {
+		return
 	}
+
 	return
 }
 
-type xcell struct {
-	Header string        // 表头
-	Width  float64       // 表头长度
-	Index  int           // 排序
-	Cell   reflect.Value // 列数据
+type xCellField struct {
+	Header       string   // 表头
+	Width        float64  // 表头长度
+	Index        int      // 排序
+	DefaultValue string   // 导出默认值
+	FormatFunc   FormatFn // 格式化函数
+	FieldName    string   //字段名称
 }
 
-type xcells []xcell
+type xCellFields []xCellField
 
-func (a xcells) Len() int           { return len(a) }
-func (a xcells) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a xcells) Less(i, j int) bool { return a[i].Index < a[j].Index }
+func (a xCellFields) Len() int           { return len(a) }
+func (a xCellFields) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a xCellFields) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
-func getExcelKeyVals(vals interface{}, formatFnMap FormatFnMap) (rows [][]xcell, err error) {
-	datas := reflect.ValueOf(vals)
-	dataKind := datas.Kind()
-	if dataKind != reflect.Array && dataKind != reflect.Slice {
+func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap FormatFnMap) (err error) {
+	cellFieldMap, err := getStructFieldInfo(vals, formatFnMap)
+	if err != nil {
+		return
+	}
+
+	// 处理表头
+	xCellFieldSlice := make(xCellFields, 0)
+	for _, field := range cellFieldMap {
+		xCellFieldSlice = append(xCellFieldSlice, field)
+	}
+	sort.Sort(xCellFieldSlice)
+
+	rowVal := sheet.AddRow()
+	for i, field := range xCellFieldSlice {
+		excelCell := rowVal.AddCell()
+		excelCell.SetValue(field.Header)
+		if field.Width > 0 {
+			sheet.SetColWidth(i, i, field.Width)
+		}
+	}
+
+	// 处理表数据
+	datasVal := reflect.ValueOf(vals)
+	for rowIndex := 0; rowIndex < datasVal.Len(); rowIndex++ { // 行
+		row := sheet.AddRow()
+		rowVal := reflect.Indirect(datasVal.Index(rowIndex))
+
+		for _, fieldInfo := range xCellFieldSlice {
+			cell := row.AddCell()
+			fieldValue := rowVal.FieldByName(fieldInfo.FieldName)
+			if polyfillIsZero(fieldValue) && fieldInfo.DefaultValue != "" { //默认值
+				fieldValue = reflect.ValueOf(fieldInfo.DefaultValue)
+			}
+
+			if fieldInfo.FormatFunc != nil {
+				formatVal := fieldInfo.FormatFunc(fieldValue.Interface())
+				fieldValue = reflect.ValueOf(formatVal)
+			}
+
+			cell.SetValue(fieldValue.Interface())
+		}
+	}
+
+	return
+}
+
+// 获取结构体信息
+func getStructFieldInfo(vals interface{}, formatFnMap FormatFnMap) (cellFieldMap map[int]xCellField, err error) {
+	datasVal := reflect.ValueOf(vals)
+	datasInd := reflect.Indirect(datasVal)
+	datasKind := datasVal.Kind()
+	if datasKind != reflect.Array && datasKind != reflect.Slice {
 		err = fmt.Errorf("datas not array or slice")
 		return
 	}
 
-	rows = make([][]xcell, 0)
-	for i := 0; i < datas.Len(); i++ { // 行
-		rowVal := reflect.Indirect(datas.Index(i))
-		rowType := rowVal.Type()
+	itemType := datasInd.Type().Elem()
+	cellFieldMap = make(map[int]xCellField, 0)
+	for fieldIndex := 0; fieldIndex < itemType.NumField(); fieldIndex++ {
+		excelTag := itemType.Field(fieldIndex).Tag.Get(defaultStructTagName)
+		if excelTag != "" { // 只处理定义了 `excel:"xxx"`
+			_, tags := parseStructTag(excelTag)
 
-		cells := make([]xcell, 0)
-		for j := 0; j < rowVal.NumField(); j++ { //列
-			excelTag := rowType.Field(j).Tag.Get(defaultStructTagName)
-			if excelTag != "" { // 只处理定义了 `excel:"xxx"`
-				_, tags := parseStructTag(excelTag)
+			if headerIndex, ok := tags[tagIndex]; ok {
+				headerName, _ := tags[tagHeader] // 表头
+				defVal, _ := tags[tagDefault]    //默认值
 
-				if headerIndex, ok := tags[tagIndex]; ok {
-					headerName, _ := tags[tagHeader] // 表头
-
-					cellVal := rowVal.Field(j)
-					if defVal, ok := tags[tagDefault]; ok && polyfillIsZero(cellVal) { // 设置默认值
-						cellVal = reflect.ValueOf(defVal)
+				var cellWidth float64
+				if widthStr, ok := tags[tagWidth]; ok { //表头宽度
+					if val, err := strconv.ParseFloat(widthStr, 64); err == nil {
+						cellWidth = val
 					}
-
-					if fnName, ok := tags[tagFormat]; ok { //格式化值
-						fn, ok := formatFnMap[fnName]
-						if !ok {
-							err = fmt.Errorf("excel tag format func not exist, check common format func or use defined custom func")
-							return
-						}
-
-						formatVal := fn(cellVal.Interface())
-						cellVal = reflect.ValueOf(formatVal)
-					}
-
-					var cellWidth float64
-					if widthStr, ok := tags[tagWidth]; ok {
-						if val, err := strconv.ParseFloat(widthStr, 64); err == nil {
-							cellWidth = val
-						}
-					}
-
-					index, _ := strconv.Atoi(headerIndex)
-					cell := xcell{
-						Index:  index,
-						Header: headerName,
-						Cell:   cellVal,
-						Width:  cellWidth,
-					}
-					cells = append(cells, cell)
 				}
+
+				var formatFunc FormatFn
+				if fnName, ok := tags[tagFormat]; ok { //格式化值
+					formatFunc, ok = formatFnMap[fnName]
+					if !ok {
+						err = fmt.Errorf("excel tag format func not exist, check common format func or use defined custom func")
+						return
+					}
+				}
+
+				index, _ := strconv.Atoi(headerIndex)
+				cellFiled := xCellField{
+					Index:        index,
+					Header:       headerName,
+					Width:        cellWidth,
+					DefaultValue: defVal,
+					FormatFunc:   formatFunc,
+					FieldName:    itemType.Field(fieldIndex).Name,
+				}
+				cellFieldMap[cellFiled.Index] = cellFiled
 			}
 		}
-		sort.Sort(xcells(cells))
-		rows = append(rows, cells)
 	}
 	return
 }

@@ -238,3 +238,16 @@ func TestFormatExportExcel(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkBaseTypeExportExcel(b *testing.B) {
+	sheetName := "sheet1"
+	originData := make([]baseExportModel, 0)
+
+	for i := 0; i < b.N; i++ {
+		originData = append(originData, baseExportData)
+	}
+
+	b.ResetTimer()
+	ExportExcel(sheetName, originData)
+	b.ReportAllocs()
+}
