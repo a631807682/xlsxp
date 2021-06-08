@@ -1,4 +1,4 @@
-module xlsxp
+module github.com/a631807682/xlsxp
 
 go 1.16
 
