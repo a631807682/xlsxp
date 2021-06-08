@@ -32,6 +32,9 @@ datas = append(datas, Test{
 
 file := xlsx.NewFile()
 err := xlsxp.ExportExcel(file, "sheet1", datas)
+...
+err := xlsxp.ExportExcel(file, "sheet2", datas)
+...
 file.Save(filepath)
 ...
 
