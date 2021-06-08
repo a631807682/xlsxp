@@ -30,7 +30,9 @@ datas = append(datas, Test{
     CompletePercent: 17.558,
 })
 
-file, err := xlsxp.ExportExcel("sheet1", datas)
+file := xlsx.NewFile()
+err := xlsxp.ExportExcel(file, "sheet1", datas)
+file.Save(filepath)
 ...
 
 ```

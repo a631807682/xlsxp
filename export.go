@@ -30,11 +30,10 @@ type Test struct {
 | 学员数据2    | 测试数据2       |
 
 */
-func ExportExcel(sheetName string, vals interface{}, cformats ...CustomFormat) (file *xlsx.File, err error) {
+func ExportExcel(file *xlsx.File, sheetName string, vals interface{}, cformats ...CustomFormat) (err error) {
 	// 初始化格式化函数
 	formatFnMap := NewFormatFn(cformats...)
 
-	file = xlsx.NewFile()
 	sheet, err := file.AddSheet(sheetName)
 	if err != nil {
 		return

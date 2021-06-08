@@ -8,6 +8,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/tealeg/xlsx"
 )
 
 type baseExportModel struct {
@@ -59,7 +61,8 @@ func TestBaseTypeExportExcel(t *testing.T) {
 	originData := make([]baseExportModel, 0)
 	originData = append(originData, baseExportData, baseExportData)
 
-	file, err := ExportExcel(sheetName, originData)
+	file := xlsx.NewFile()
+	err := ExportExcel(file, sheetName, originData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +102,8 @@ func TestTimeTypeExportExcel(t *testing.T) {
 		Time: time.Now().Add(10000),
 	})
 
-	file, err := ExportExcel(sheetName, originData)
+	file := xlsx.NewFile()
+	err := ExportExcel(file, sheetName, originData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,7 +167,8 @@ func TestSortExportExcel(t *testing.T) {
 		StringC: randStringBytes(10),
 	})
 
-	file, err := ExportExcel(sheetName, originData)
+	file := xlsx.NewFile()
+	err := ExportExcel(file, sheetName, originData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,7 +210,8 @@ func TestFormatExportExcel(t *testing.T) {
 		Percent: rand.Float64(),
 	})
 
-	file, err := ExportExcel(sheetName, originData)
+	file := xlsx.NewFile()
+	err := ExportExcel(file, sheetName, originData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -248,6 +254,7 @@ func BenchmarkBaseTypeExportExcel(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	ExportExcel(sheetName, originData)
+	file := xlsx.NewFile()
+	ExportExcel(file, sheetName, originData)
 	b.ReportAllocs()
 }
