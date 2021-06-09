@@ -168,7 +168,7 @@ func TestSortExportExcel(t *testing.T) {
 	})
 
 	file := xlsx.NewFile()
-	err := ExportExcel(file, sheetName, originData)
+	err := ExportExcel(file, sheetName, &originData)
 	if err != nil {
 		t.Fatal(err)
 	}

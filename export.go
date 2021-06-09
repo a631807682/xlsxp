@@ -86,10 +86,10 @@ func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap For
 	}
 
 	// 处理表数据
-	datasVal := reflect.ValueOf(vals)
-	for rowIndex := 0; rowIndex < datasVal.Len(); rowIndex++ { // 行
+	datasInd := reflect.Indirect(reflect.ValueOf(vals))
+	for rowIndex := 0; rowIndex < datasInd.Len(); rowIndex++ { // 行
 		row := sheet.AddRow()
-		rowVal := reflect.Indirect(datasVal.Index(rowIndex))
+		rowVal := reflect.Indirect(datasInd.Index(rowIndex))
 
 		for _, fieldInfo := range xCellFieldSlice {
 			cell := row.AddCell()
@@ -114,7 +114,8 @@ func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap For
 func getStructFieldInfo(vals interface{}, formatFnMap FormatFnMap) (cellFieldMap map[int]xCellField, err error) {
 	datasVal := reflect.ValueOf(vals)
 	datasInd := reflect.Indirect(datasVal)
-	datasKind := datasVal.Kind()
+	datasKind := datasInd.Kind()
+
 	if datasKind != reflect.Array && datasKind != reflect.Slice {
 		err = fmt.Errorf("datas not array or slice")
 		return
