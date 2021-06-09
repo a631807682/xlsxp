@@ -52,7 +52,7 @@ err = xlsxp.ImportExcel(xlsxBuf.Bytes(), "sheet1", &targetDatas)
 ```
 
 ### Notice
-Not support huge amounts of data. See:
-[xlsx/issues/539](https://github.com/tealeg/xlsx/issues/539)
-[xlsx/blob/master/file.go#L169](https://github.com/tealeg/xlsx/blob/master/file.go#L169)
-[xlsx/blob/master/file.go#L410](https://github.com/tealeg/xlsx/blob/master/file.go#L410)
+Not support huge amounts of data. See:  
+[xlsx/issues/539](https://github.com/tealeg/xlsx/issues/539)  
+[xlsx/blob/master/file.go#L169](https://github.com/tealeg/xlsx/blob/master/file.go#L169)  
+[xlsx/blob/master/file.go#L410](https://github.com/tealeg/xlsx/blob/master/file.go#L410)  
