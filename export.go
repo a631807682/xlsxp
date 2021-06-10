@@ -76,13 +76,23 @@ func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap For
 	}
 	sort.Sort(xCellFieldSlice)
 
-	rowVal := sheet.AddRow()
-	for i, field := range xCellFieldSlice {
-		excelCell := rowVal.AddCell()
-		excelCell.SetValue(field.Header)
-		if field.Width > 0 {
-			sheet.SetColWidth(i, i, field.Width)
+	headRow := sheet.AddRow()
+	headCellIndex := 0
+	for _, fieldInfo := range xCellFieldSlice {
+		if fieldInfo.Index > headCellIndex { //跳过序号
+			skipNum := fieldInfo.Index - headCellIndex
+			for i := 0; i < skipNum; i++ {
+				headRow.AddCell()
+			}
+			headCellIndex += skipNum
 		}
+
+		excelCell := headRow.AddCell()
+		excelCell.SetValue(fieldInfo.Header)
+		if fieldInfo.Width > 0 {
+			sheet.SetColWidth(headCellIndex, headCellIndex, fieldInfo.Width)
+		}
+		headCellIndex++
 	}
 
 	// 处理表数据
@@ -102,7 +112,6 @@ func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap For
 			}
 
 			cell := row.AddCell()
-			cellIndex++
 
 			fieldValue := rowVal.FieldByName(fieldInfo.FieldName)
 			if polyfillIsZero(fieldValue) && fieldInfo.DefaultValue != "" { //默认值
@@ -115,6 +124,7 @@ func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap For
 			}
 
 			cell.SetValue(fieldValue.Interface())
+			cellIndex++
 		}
 	}
 

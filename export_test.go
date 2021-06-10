@@ -245,6 +245,30 @@ func TestFormatExportExcel(t *testing.T) {
 	}
 }
 
+type headerExportModel struct {
+	Header3 string `excel:"index(2);header(Header3)"`
+	Header1 string `excel:"index(0);header(Header1)"`
+}
+
+func TestHeaderExportExcel(t *testing.T) {
+	sheetName := "sheet1"
+
+	originData := make([]headerExportModel, 0)
+
+	file := xlsx.NewFile()
+	err := ExportExcel(file, sheetName, originData)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	headRow := file.Sheet[sheetName].Rows[0]
+	if headRow.Cells[0].String() != "Header1" ||
+		headRow.Cells[2].String() != "Header3" {
+
+		t.Fatal(fmt.Errorf("target head not equal headRow:%+v", headRow))
+	}
+}
+
 func BenchmarkBaseTypeExportExcel(b *testing.B) {
 	sheetName := "sheet1"
 	originData := make([]baseExportModel, 0)
