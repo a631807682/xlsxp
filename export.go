@@ -91,8 +91,19 @@ func setStructIntoExcelVals(sheet *xlsx.Sheet, vals interface{}, formatFnMap For
 		row := sheet.AddRow()
 		rowVal := reflect.Indirect(datasInd.Index(rowIndex))
 
+		cellIndex := 0
 		for _, fieldInfo := range xCellFieldSlice {
+			if fieldInfo.Index > cellIndex { //跳过序号
+				skipNum := fieldInfo.Index - cellIndex
+				for i := 0; i < skipNum; i++ {
+					row.AddCell()
+				}
+				cellIndex += skipNum
+			}
+
 			cell := row.AddCell()
+			cellIndex++
+
 			fieldValue := rowVal.FieldByName(fieldInfo.FieldName)
 			if polyfillIsZero(fieldValue) && fieldInfo.DefaultValue != "" { //默认值
 				fieldValue = reflect.ValueOf(fieldInfo.DefaultValue)

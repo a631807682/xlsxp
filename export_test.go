@@ -148,7 +148,7 @@ func randStringBytes(n int) string {
 }
 
 type sortExportModel struct {
-	StringA string `excel:"index(2)"`
+	StringA string `excel:"index(4)"`
 	StringB string `excel:"index(1)"`
 	StringC string `excel:"index(0)"`
 }
