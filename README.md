@@ -1,18 +1,20 @@
 # xlsxp ![test](https://github.com/a631807682/xlsxp/actions/workflows/test.yml/badge.svg)
-Easier imports and exports with [xlsx](https://github.com/tealeg/xlsx)
+Easier imports and exports excel with [xlsx](https://github.com/tealeg/xlsx)
 
 ## Description
-> The `excel` tag defines what to export from `struct` to `XLXS`.
+> The `excel` tag defines what to import and export from `struct` to `XLXS`.
 
-1. `header` represents the header to display.
-2. `index` represents the order of data.
+### Import
+1. `index` represents the order of data.
+2. `parse` represents a method of parsing corresponds to the `format`.
+### Export
+1. `index` represents the order of data.
+2. `header` represents the header to display.
 3. `format` represents a method of formatting.
 4. `default` represents what to display when the data is empty.
+5. `width` represents the header width.
 
-## Example
-
-
-### Export xlsx 
+### Export xlsx example  
 ```go
 type Test struct {
     UserName string `json:"user_name" excel:"header(Student);index(0);default(---)"`
@@ -40,7 +42,7 @@ file.Save(filepath)
 
 ```
 
-### Import xlsx 
+### Import xlsx example  
 ```go
 type Test struct {
     CompletePercent float64 `json:"complete_percent" excel:"index(1);parse(percent)"`
