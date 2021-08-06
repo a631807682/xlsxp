@@ -1,3 +1,4 @@
+# reviewdog.yml
 
 runner:
   golint:
