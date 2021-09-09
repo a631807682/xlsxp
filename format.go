@@ -54,11 +54,11 @@ func formatPercent(n interface{}) string {
 
 // 格式化日期
 func formDate(n interface{}) string {
-	switch n.(type) {
+	switch n := n.(type) {
 	case time.Time:
-		return n.(time.Time).Format("2006-01-02")
+		return n.Format("2006-01-02")
 	case string:
-		return n.(string)
+		return n
 	default:
 		return ""
 	}
@@ -66,17 +66,17 @@ func formDate(n interface{}) string {
 
 func formHour(n interface{}) string {
 	var seconds int64 = 0
-	switch n.(type) {
+	switch n := n.(type) {
 	case int:
-		seconds = int64(n.(int))
+		seconds = int64(n)
 	case int8:
-		seconds = int64(n.(int8))
+		seconds = int64(n)
 	case int16:
-		seconds = int64(n.(int16))
+		seconds = int64(n)
 	case int32:
-		seconds = int64(n.(int32))
+		seconds = int64(n)
 	case int64:
-		seconds = n.(int64)
+		seconds = n
 
 	}
 
