@@ -150,8 +150,8 @@ func getStructFieldInfo(vals interface{}, formatFnMap FormatFnMap) (cellFieldMap
 			_, tags := parseStructTag(excelTag)
 
 			if headerIndex, ok := tags[tagIndex]; ok {
-				headerName, _ := tags[tagHeader] // 表头
-				defVal, _ := tags[tagDefault]    //默认值
+				headerName := tags[tagHeader] // 表头
+				defVal := tags[tagDefault]    //默认值
 
 				var cellWidth float64
 				if widthStr, ok := tags[tagWidth]; ok { //表头宽度
