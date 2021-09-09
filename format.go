@@ -69,19 +69,15 @@ func formHour(n interface{}) string {
 	switch n.(type) {
 	case int:
 		seconds = int64(n.(int))
-		break
 	case int8:
 		seconds = int64(n.(int8))
-		break
 	case int16:
 		seconds = int64(n.(int16))
-		break
 	case int32:
 		seconds = int64(n.(int32))
-		break
 	case int64:
 		seconds = n.(int64)
-		break
+
 	}
 
 	s := seconds % 60

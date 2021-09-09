@@ -119,19 +119,15 @@ func mapCellIntoValue(filedInd reflect.Value, cell *xlsx.Cell) {
 	switch filedInd.Kind() {
 	case reflect.Bool:
 		filedInd.SetBool(cell.Bool())
-		break
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		val, _ := cell.Int64()
 		filedInd.SetInt(val)
-		break
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		val, _ := strconv.ParseUint(cell.String(), 10, 64)
 		filedInd.SetUint(val)
-		break
 	case reflect.Float64, reflect.Float32:
 		val, _ := cell.Float()
 		filedInd.SetFloat(val)
-		break
 	case reflect.String:
 		filedInd.SetString(cell.String())
 	case reflect.Struct:
@@ -147,7 +143,5 @@ func mapCellIntoValue(filedInd reflect.Value, cell *xlsx.Cell) {
 				filedInd.Set(reflect.ValueOf(t))
 			}
 		}
-
-		break
 	}
 }
