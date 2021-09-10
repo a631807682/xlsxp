@@ -135,8 +135,7 @@ func mapCellIntoValue(filedInd reflect.Value, cell *xlsx.Cell) {
 			filedInd.Set(reflect.Zero(filedInd.Type()))
 		}
 
-		switch filedInd.Interface().(type) {
-		case time.Time:
+		if _, ok := filedInd.Interface().(time.Time); ok {
 			t, err := cell.GetTime(false)
 			if err == nil {
 				t = t.In(time.Local) //时区转换
