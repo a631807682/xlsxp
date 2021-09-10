@@ -143,7 +143,7 @@ func getStructFieldInfo(vals interface{}, formatFnMap FormatFnMap) (cellFieldMap
 	}
 
 	itemType := datasInd.Type().Elem()
-	cellFieldMap = make(map[int]xCellField, 0)
+	cellFieldMap = make(map[int]xCellField)
 	for fieldIndex := 0; fieldIndex < itemType.NumField(); fieldIndex++ {
 		excelTag := itemType.Field(fieldIndex).Tag.Get(defaultStructTagName)
 		if excelTag != "" { // 只处理定义了 `excel:"xxx"`
