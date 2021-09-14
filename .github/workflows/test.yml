@@ -17,4 +17,6 @@ jobs:
     - name: Test
       run: go test ./...
     - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: 3e2b87db-308b-45fd-962a-1e44dcf0ae47
       run: bash <(curl -s https://codecov.io/bash)
