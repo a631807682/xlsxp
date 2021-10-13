@@ -143,6 +143,10 @@ func getStructFieldInfo(vals interface{}, formatFnMap FormatFnMap) (cellFieldMap
 	}
 
 	itemType := datasInd.Type().Elem()
+	if itemType.Kind() == reflect.Ptr {
+		itemType = itemType.Elem()
+
+	}
 	cellFieldMap = make(map[int]xCellField)
 	for fieldIndex := 0; fieldIndex < itemType.NumField(); fieldIndex++ {
 		excelTag := itemType.Field(fieldIndex).Tag.Get(defaultStructTagName)

@@ -88,6 +88,38 @@ func TestBaseTypeExportExcel(t *testing.T) {
 
 }
 
+func TestSlicePtrStructExportExcel(t *testing.T) {
+	sheetName := "sheet1"
+
+	originData := make([]*baseExportModel, 0)
+	originData = append(originData, &baseExportData, &baseExportData)
+
+	file := xlsx.NewFile()
+	err := ExportExcel(file, sheetName, originData)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var xlsxBuf bytes.Buffer
+	err = file.Write(&xlsxBuf)
+	if err != nil {
+		return
+	}
+
+	xlsxBytes := xlsxBuf.Bytes()
+
+	targetDatas := make([]*baseExportModel, 0)
+	err = ImportExcel(xlsxBytes, sheetName, &targetDatas)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(originData, targetDatas) {
+		t.Fatal(fmt.Errorf("origin target not equal \n origin:%+v \n target:%+v",
+			originData, targetDatas))
+	}
+}
+
 type timeExportModel struct {
 	Time time.Time `excel:"index(0)"` // 精度会丢失
 }

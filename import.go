@@ -53,6 +53,9 @@ func setExcelValsIntoStruct(sheet *xlsx.Sheet, targets interface{}, parseFnMap P
 	// 列序号对应的字段序号
 	cellFieldInfoMap := make(map[int]fieldInfo)
 	itemType := targetsInd.Type().Elem()
+	if itemType.Kind() == reflect.Ptr {
+		itemType = itemType.Elem()
+	}
 	for fieldIndex := 0; fieldIndex < itemType.NumField(); fieldIndex++ {
 		excelTag := itemType.Field(fieldIndex).Tag.Get(defaultStructTagName)
 		if excelTag != "" { // 只处理定义了 `excel:"xxx"`
@@ -95,11 +98,16 @@ func setExcelValsIntoStruct(sheet *xlsx.Sheet, targets interface{}, parseFnMap P
 			elem = reflect.New(typ).Elem()
 		}
 
+		elemType := elem
+		if elem.Kind() == reflect.Ptr {
+			elemType = elem.Elem()
+		}
+
 		// 把列写入数据中
 		for cIndex, cell := range row.Cells {
 			fieldInfo, ok := cellFieldInfoMap[cIndex]
 			if ok {
-				targetField := elem.Field(fieldInfo.fieldIndex)
+				targetField := elemType.Field(fieldInfo.fieldIndex)
 				if fieldInfo.parseFn != nil {
 					pVal := fieldInfo.parseFn(cell.String())
 					cell.SetValue(pVal)
